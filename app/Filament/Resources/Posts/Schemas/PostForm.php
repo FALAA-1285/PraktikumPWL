@@ -12,6 +12,9 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Schemas\Components\Section;
+use Filament\Support\Icons\Heroicon;
+use Filament\Schemas\Components\Group;
 
 class PostForm
 {
@@ -19,21 +22,42 @@ class PostForm
     {
         return $schema
             ->components([
-                //
-                TextInput::make("title")->required()->minLength(5),
-                TextInput::make("slug")->required()->unique(),
-                select::make("category_id")
-                ->label("Category")->options
-                (\App\Models\Category::all()->pluck('name', 'id'))
-                ->searchable()
-                ->required(),
-                ColorPicker::make("color"),
-                MarkdownEditor::make("content")->required(),
-                // RichEditor::make("content")->required(),
-                FileUpload::make("image")->disk("public")->directory("posts"),
-                TagsInput::make('tags'),
-                Checkbox::make("published"),
-                DateTimePicker::make("published_at"),
-            ]);
+                Group::make([
+                    // Section 1 Post Detail
+                    Section::make("Post Details")
+                        ->description("Fill in the details of the post.")
+                        ->icon(Heroicon::OutlinedDocumentText)
+                        ->schema([
+                            TextInput::make("title"),
+                            TextInput::make("slug"),
+                            Select::make("category_id")
+                                ->relationship("category", "name")
+                                ->preload()
+                                ->searchable(),
+                            ColorPicker::make("color"),
+                            MarkdownEditor::make("content")
+                                ->columnSpanFull(),
+                        ])->columns(2),
+                ])->columnSpan(['default' => 3, 'md' => 2]),
+
+                Group::make([
+                    // Section 2 Image
+                    Section::make("Image Upload")
+                        ->icon(Heroicon::OutlinedPhoto)
+                        ->schema([
+                            FileUpload::make("image")
+                                ->disk("public")
+                                ->directory("posts"),
+                        ]),
+                    // Section 3 Meta Information
+                    Section::make("Meta Information")
+                        ->icon(Heroicon::OutlinedTag)
+                        ->schema([
+                            TagsInput::make('tags'),
+                            Checkbox::make("published"),
+                            DateTimePicker::make("published_at"),
+                        ]),
+                ])->columnSpan(['default' => 3, 'md' => 1]),
+            ])->columns(3);
     }
 }
