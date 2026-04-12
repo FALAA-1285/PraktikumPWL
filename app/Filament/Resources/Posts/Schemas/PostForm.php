@@ -28,10 +28,15 @@ class PostForm
                         ->description("Fill in the details of the post.")
                         ->icon(Heroicon::OutlinedDocumentText)
                         ->schema([
-                            TextInput::make("title"),
-                            TextInput::make("slug"),
+                            TextInput::make("title")
+                                ->rules(['required', 'min:3', 'max:10']),
+                            TextInput::make("slug")
+                                ->rule('Required')
+                                ->unique()
+                                ->validationMessages(['unique' => 'The slug must be unique.',]),
                             Select::make("category_id")
                                 ->relationship("category", "name")
+                                ->required()
                                 ->preload()
                                 ->searchable(),
                             ColorPicker::make("color"),
@@ -46,6 +51,7 @@ class PostForm
                         ->icon(Heroicon::OutlinedPhoto)
                         ->schema([
                             FileUpload::make("image")
+                                ->required()
                                 ->disk("public")
                                 ->directory("posts"),
                         ]),
