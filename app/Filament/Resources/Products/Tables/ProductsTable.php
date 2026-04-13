@@ -17,9 +17,13 @@ class ProductsTable
         return $table
             ->columns([
                 TextColumn::make('name'),
-                TextColumn::make('sku'),
-                TextColumn::make('price'),
-                TextColumn::make('stock'),
+                TextColumn::make('sku')
+                    ->badge()
+                    ->color('info'),
+                TextColumn::make('price')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state, 0, ',', '.')),
+                TextColumn::make('stock')
+                    ->icon('heroicon-m-archive-box'),
                 ImageColumn::make('image')
                     ->disk('public'),
                 TextColumn::make('is_active')
