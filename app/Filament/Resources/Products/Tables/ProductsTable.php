@@ -23,7 +23,13 @@ class ProductsTable
                 TextColumn::make('price')
                     ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state, 0, ',', '.')),
                 TextColumn::make('stock')
-                    ->icon('heroicon-m-archive-box'),
+                    ->icon('heroicon-m-archive-box')
+                    ->badge()
+                    ->color(fn ($state) => match (true) {
+                        $state <= 5 => 'danger',
+                        $state <= 20 => 'warning',
+                        default => 'success',
+                    }),
                 ImageColumn::make('image')
                     ->disk('public'),
                 TextColumn::make('is_active')
