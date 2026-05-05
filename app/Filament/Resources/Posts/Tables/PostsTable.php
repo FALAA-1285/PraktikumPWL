@@ -3,17 +3,22 @@
 namespace App\Filament\Resources\Posts\Tables;
 
 use App\Filament\Resources\Categories\Schemas\CategoryForm;
+use Dom\Text;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ReplicateAction;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\ColorColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Symfony\Component\HttpFoundation\RequestMatcher\QueryParameterRequestMatcher;
 
 class PostsTable
 {
@@ -21,24 +26,38 @@ class PostsTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('id')
+                    ->label('ID')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('title')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('slug')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('category.name')
                     ->sortable()
-                    ->searchable(),
-                ColorColumn::make('color'),
+                    ->searchable()
+                    ->toggleable(),
+                ColorColumn::make('color')
+                    ->toggleable(),
                 ImageColumn::make('image')
-                    ->disk('public'),
+                    ->disk('public')
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->label('Created At')
-                    ->sortable(),
-            ])->defaultSort('created_at', 'desc')
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('tags')
+                    ->label('Tags')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                IconColumn::make('published')
+                    ->boolean()
+                    ->toggleable(),
+            ])->defaultSort('created_at', 'asc')
             ->filters([
                 Filter::make('created_at')
                     ->label('Creation Date')
@@ -59,7 +78,20 @@ class PostsTable
                     ->preload(),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->icon('heroicon-o-pencil'),
+                ReplicateAction::make()
+                    ->icon('heroicon-o-document-duplicate'),
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash'),
+                Action::make('toggle_publish')
+                    ->label(fn ($record) => $record->published ? 'Unpublish' : 'Publish')
+                    ->icon(fn ($record) => $record->published ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                    ->color(fn ($record) => $record->published ? 'warning' : 'success')
+                    ->action(fn ($record) => $record->update(['published' => !$record->published]))
+                    ->requiresConfirmation()
+                    ->modalHeading(fn ($record) => $record->published ? 'Unpublish Post?' : 'Publish Post?')
+                    ->modalDescription('Are you sure you want to change the publish status of this post?'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
