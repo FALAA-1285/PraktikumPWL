@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Posts\Schemas;
 
+use App\Models\Category;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -59,7 +60,9 @@ class PostForm
                     Section::make("Meta Information")
                         ->icon(Heroicon::OutlinedTag)
                         ->schema([
-                            TagsInput::make('tags'),
+                            Select::make('tags')
+                                ->relationship('tags', 'name')
+                                ->multiple(),
                             Checkbox::make("published"),
                             DateTimePicker::make("published_at"),
                         ]),

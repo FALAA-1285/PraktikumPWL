@@ -85,12 +85,12 @@ class PostsTable
                 DeleteAction::make()
                     ->icon('heroicon-o-trash'),
                 Action::make('toggle_publish')
-                    ->label(fn ($record) => $record->published ? 'Unpublish' : 'Publish')
-                    ->icon(fn ($record) => $record->published ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                    ->color(fn ($record) => $record->published ? 'warning' : 'success')
-                    ->action(fn ($record) => $record->update(['published' => !$record->published]))
+                    ->label(fn($record) => $record->published ? 'Unpublish' : 'Publish')
+                    ->icon(fn($record) => $record->published ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                    ->color(fn($record) => $record->published ? 'warning' : 'success')
+                    ->action(fn($record) => $record->update(['published' => !$record->published]))
                     ->requiresConfirmation()
-                    ->modalHeading(fn ($record) => $record->published ? 'Unpublish Post?' : 'Publish Post?')
+                    ->modalHeading(fn($record) => $record->published ? 'Unpublish Post?' : 'Publish Post?')
                     ->modalDescription('Are you sure you want to change the publish status of this post?'),
             ])
             ->toolbarActions([
